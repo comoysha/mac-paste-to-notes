@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AMApplicationBuild</key>
+	<string>526</string>
+	<key>AMApplicationVersion</key>
+	<string>2.10</string>
+	<key>AMDocumentVersion</key>
+	<string>2</string>
+	<key>actions</key>
+	<array>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMAccepts</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Optional</key>
+					<true/>
+					<key>Types</key>
+					<array>
+						<string>com.apple.applescript.object</string>
+					</array>
+				</dict>
+				<key>AMActionVersion</key>
+				<string>1.0.2</string>
+				<key>AMApplication</key>
+				<array>
+					<string>自动操作</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>source</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.applescript.object</string>
+					</array>
+				</dict>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Run AppleScript.action</string>
+				<key>ActionName</key>
+				<string>运行AppleScript</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>source</key>
+					<string>--------------------------------------------------------------------------------
+-- 0. 准备：辅助变量 &amp; beep 测试
+--------------------------------------------------------------------------------
+-- 测试：让脚本开始时就发出提示音，确认脚本已运行
+-- beep 1
+-- display dialog "脚本开始执行..." buttons {"继续"} default button "继续"
+
+--------------------------------------------------------------------------------
+-- 1. 获取当前前台应用名称，后面要切回
+--------------------------------------------------------------------------------
+tell application "System Events"
+	set frontAppProcess to first process whose frontmost is true
+	set frontApp to name of frontAppProcess
+end tell
+
+-- display dialog ("当前前台应用：" &amp; frontApp) buttons {"继续"} default button "继续"
+
+--------------------------------------------------------------------------------
+-- 2. 激活前台应用并复制选中的文本
+--------------------------------------------------------------------------------
+tell application frontApp
+	activate
+end tell
+
+-- 显示对话框，提示即将执行 Cmd + C
+-- display dialog "即将复制选中文本 (Cmd + C)" buttons {"继续"} default button "继续"
+
+-- 给一点时间让系统切回前台App
+delay 0.5
+
+tell application "System Events"
+	try
+		-- 使当前应用保持前台
+		tell process frontApp
+			set frontmost to true
+			
+			-- 根据系统语言选择合适的菜单名：
+			-- 如果是英文系统：menu bar item "Edit" -&gt; menu "Edit" -&gt; menu item "Copy"
+			-- 如果是中文系统：menu bar item "编辑" -&gt; menu "编辑" -&gt; menu item "复制"
+			-- 下面示例以英文为例，可改成中文。
+			
+			click menu bar item "Edit" of menu bar 1
+			delay 0.2
+			click menu item "Copy" of menu "Edit" of menu bar item "Edit" of menu bar 1
+		end tell
+	on error errMsg
+		display dialog "在点击菜单“复制”时出错: " &amp; errMsg
+	end try
+end tell
+
+--------------------------------------------------------------------------------
+-- 2.1 立刻查看剪贴板内容（调试用）
+--------------------------------------------------------------------------------
+-- 延时一点，确保复制完成
+delay 0.5
+set currentClipboard to the clipboard as text
+-- display dialog ("复制后，剪贴板内容为： " &amp; return &amp; currentClipboard) buttons {"继续"} default button "继续"
+
+--------------------------------------------------------------------------------
+-- 3. 启动或前置备忘录 (Notes)，并粘贴到文稿底部，加两个回车
+--------------------------------------------------------------------------------
+-- display dialog "现在切到备忘录并粘贴" buttons {"继续"} default button "继续"
+
+tell application "Notes"
+	activate
+end tell
+
+-- 等待备忘录激活
+delay 1
+
+tell application "System Events"
+	beep 1
+	keystroke "v" using {command down}
+	key code 36 -- 回车
+	key code 36 -- 回车
+end tell
+
+--------------------------------------------------------------------------------
+-- 3.1 再次查看剪贴板内容（调试用）
+--------------------------------------------------------------------------------
+-- 也可以看看在粘贴之后，剪贴板是否还保持着同样的内容
+delay 0.5
+-- set currentClipboard2 to the clipboard as text
+-- display dialog ("粘贴后，剪贴板内容为： " &amp; return &amp; currentClipboard2) buttons {"继续"} default button "继续"
+
+--------------------------------------------------------------------------------
+-- 4. 回到原应用
+--------------------------------------------------------------------------------
+-- display dialog "现在将返回 " &amp; frontApp buttons {"继续"} default button "继续"
+
+tell application frontApp
+	activate
+end tell
+
+--------------------------------------------------------------------------------
+-- 5. 脚本结束
+--------------------------------------------------------------------------------
+-- beep 1
+-- display dialog "脚本已结束" buttons {"完成"} default button "完成"
+</string>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.Automator.RunScript</string>
+				<key>CFBundleVersion</key>
+				<string>1.0.2</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<false/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryUtilities</string>
+				</array>
+				<key>Class Name</key>
+				<string>RunScriptAction</string>
+				<key>InputUUID</key>
+				<string>4D5C5B33-06BC-4567-A5B0-3CC350B07F4B</string>
+				<key>Keywords</key>
+				<array>
+					<string>运行</string>
+				</array>
+				<key>OutputUUID</key>
+				<string>CB0BA7DB-3D1A-461B-AF97-BDDB14A78C75</string>
+				<key>UUID</key>
+				<string>5F160B0E-8B79-4CA0-950A-6580652A5206</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<string>on run {input, parameters}
+	
+	(* Your script goes here *)
+	
+	return input
+end run</string>
+						<key>name</key>
+						<string>source</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+				</dict>
+				<key>isViewVisible</key>
+				<integer>1</integer>
+				<key>location</key>
+				<string>309.000000:427.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Run AppleScript.action/Contents/Resources/Base.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>connectors</key>
+	<dict/>
+	<key>workflowMetaData</key>
+	<dict>
+		<key>workflowTypeIdentifier</key>
+		<string>com.apple.Automator.workflow</string>
+	</dict>
+</dict>
+</plist>
